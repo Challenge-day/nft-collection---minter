@@ -10,7 +10,7 @@ import "./messages/nfts";
 contract ChallengeNFTCollection with Deployable, Ownable, Resumable, NFTCollectionStandard {
     owner: Address;
     stopped: Bool = false;
-    next_item_index: Int as uint256 = 1;
+    next_item_index: Int as uint256 = 0;
     collection_content: Cell;
 
     minters: Minters;
@@ -29,7 +29,7 @@ contract ChallengeNFTCollection with Deployable, Ownable, Resumable, NFTCollecti
     receive(msg: Mint) {
         self._check_minter();
         self.requireNotStopped();
-        self._mint(msg.new_owner, msg.quantity);
+        self._mint(msg.new_owner, msg.quantity, msg.query_id);
     }
 
     receive(msg: RelinquishOwnership) {
@@ -42,7 +42,7 @@ contract ChallengeNFTCollection with Deployable, Ownable, Resumable, NFTCollecti
     receive("mint_one_for_self") {
         self.requireOwner();
         self.requireNotStopped();
-        self._mint(self.owner, 1);
+        self._mint(self.owner, 1, random(0, pow(2, 64)));
     }
 
     inline fun _add_minter(address: Address) {
@@ -60,10 +60,15 @@ contract ChallengeNFTCollection with Deployable, Ownable, Resumable, NFTCollecti
         require(self.minters.isMinter(ctx.sender), "only_minter");
     }
 
-    inline fun _mint(to: Address, quantity: Int) {
+    inline fun _mint(to: Address, quantity: Int, query_id: Int) {
+        require(quantity > 0, "quantity_must_be_greater_than_0");
+        
         let _quantity: Int = quantity;
+        let ctx: Context = context();
+        let value: Int = self.msgValue(ctx.value);
 
         while(_quantity > 0) {
+            query_id = query_id + 1;
             let nftInit: StateInit = self._get_nft_item_state_init(self.next_item_index);
             let nftAddress: Address = contractAddress(nftInit);
             send(SendParameters{
@@ -71,13 +76,13 @@ contract ChallengeNFTCollection with Deployable, Ownable, Resumable, NFTCollecti
                 mode: SendIgnoreErrors,
                 code: nftInit.code,
                 data: nftInit.data,
-                value: self.msgValue(context().value),
+                value: value / quantity,
                 bounce: false,
                 body: Transfer{
-                    query_id: 0,
+                    query_id,
                     new_owner: to,
                     response_destination: context().sender,
-                    custom_payload: emptyCell(),
+                    custom_payload: self.collection_content,
                     forward_amount: 0,
                     forward_payload: emptyCell()
                 }.toCell()
@@ -106,8 +111,8 @@ contract ChallengeNFTItem with Ownable, NFTItemStandard {
     collection_address: Address;
     individual_content: Cell;
 
-    minTonForStorage: Int = ton("0.05");
-    gasConsumption: Int = ton("0.05");
+    minTonForStorage: Int = ton("0.03");
+    gasConsumption: Int = ton("0.03");
 
     init(collection_address: Address, index: Int, owner: Address, individual_content: Cell) {
         self.collection_address = collection_address;
@@ -128,7 +133,7 @@ contract ChallengeNFTItem with Ownable, NFTItemStandard {
             self.individual_content = msg.custom_payload!!;
             send(SendParameters{
                 to: msg.response_destination!!,
-                value: _msgVal,
+                value: 0,
                 mode: SendIgnoreErrors + SendRemainingValue,
                 body: Excesses{ query_id: msg.query_id }.toCell()
             });
@@ -152,7 +157,7 @@ contract ChallengeNFTItem with Ownable, NFTItemStandard {
 
             _msgVal = _msgVal - ctx.readForwardFee();
 
-            if (msg.response_destination != null) {
+            if (msg.response_destination != null && _msgVal > msg.forward_amount) {
                 send(SendParameters{
                     to: msg.response_destination!!,
                     value: _msgVal - msg.forward_amount,

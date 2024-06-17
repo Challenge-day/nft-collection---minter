@@ -3,7 +3,7 @@ import { ChallengeNFTCollection } from '../wrappers/ChallengeNFTCollection';
 import { NetworkProvider } from '@ton/blueprint';
 
 const OFFCHAIN_TAG = 0x01;
-const BASE_URL = 'https://s.getgems.io/nft/c/665d3d0288f45e66efa10d57/';
+const BASE_URL = 'https://s.getgems.io/nft-staging/c/628f6ab8077060a7a8d52d63/';
 
 export async function run(provider: NetworkProvider) {
     const collectionContent = beginCell().storeInt(OFFCHAIN_TAG, 8).storeStringRefTail(BASE_URL).endCell();

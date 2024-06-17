@@ -2,10 +2,10 @@ import { Address, toNano } from '@ton/core';
 import { ChallengeNFTCollection } from '../wrappers/ChallengeNFTCollection';
 import { NetworkProvider } from '@ton/blueprint';
 
-const ADDR = 'EQBqtS-X3-B-FR6Xsj9vwxzbVJJu2ogS_jJbETB0kV5q4POL';
+const ADDR = 'EQBQKQseSL8mXW3isPicq2QqMCJp1v0_E_3EfXtTlyGnz92I';
 
 export async function run(provider: NetworkProvider) {
-    const challengeNFTCollection = provider.open(await ChallengeNFTCollection.fromAddress(Address.parse(ADDR)));
+    const challengeNFTCollection = provider.open(ChallengeNFTCollection.fromAddress(Address.parse(ADDR)));
 
     // await challengeNFTCollection.send(
     //     provider.sender(),
@@ -17,12 +17,12 @@ export async function run(provider: NetworkProvider) {
 
     await challengeNFTCollection.send(
         provider.sender(),
-        { value: toNano('0.03') },
+        { value: toNano('0.5') },
         {
             $$type: 'Mint',
             query_id: 0n,
-            quantity: 1n,
-            new_owner: Address.parse('0:0de6e7b03cf924ce1fed8f58ec04b1fd21b943326f8beede67f09d96372fc43c'),
+            quantity: 3n,
+            new_owner: Address.parse('0QDOekWhG6_fn14DU51jnA7hniRfWFn_JZt-hFN4JrZuB-ea'),
         },
     );
 

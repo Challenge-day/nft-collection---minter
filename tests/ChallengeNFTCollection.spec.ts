@@ -1,5 +1,5 @@
 import { Blockchain, SandboxContract, TreasuryContract } from '@ton/sandbox';
-import { toNano } from '@ton/core';
+import { beginCell, toNano } from '@ton/core';
 import { ChallengeNFTCollection } from '../wrappers/ChallengeNFTCollection';
 import '@ton/test-utils';
 
@@ -8,10 +8,14 @@ describe('ChallengeNFTCollection', () => {
     let deployer: SandboxContract<TreasuryContract>;
     let challengeNFTCollection: SandboxContract<ChallengeNFTCollection>;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         blockchain = await Blockchain.create();
 
-        challengeNFTCollection = blockchain.openContract(await ChallengeNFTCollection.fromInit());
+        const OFFCHAIN_TAG = 0x01;
+        const BASE_URL = 'https://s.getgems.io/nft/c/665d3d0288f45e66efa10d57/';
+        const collectionContent = beginCell().storeInt(OFFCHAIN_TAG, 8).storeStringRefTail(BASE_URL).endCell();
+
+        challengeNFTCollection = blockchain.openContract(await ChallengeNFTCollection.fromInit(collectionContent));
 
         deployer = await blockchain.treasury('deployer');
 
@@ -34,8 +38,8 @@ describe('ChallengeNFTCollection', () => {
         });
     });
 
-    it('should deploy', async () => {
-        // the check is done inside beforeEach
-        // blockchain and challengeNFTCollection are ready to use
+    it('should dump', async () => {
+        const mint = await challengeNFTCollection.send(deployer.getSender(), { value: toNano('0.1') }, "mint_one_for_self");
+        console.log(mint.transactions);
     });
 });
