@@ -15,8 +15,8 @@ contract ChallengeNFTCollection with Deployable, Ownable, Resumable, NFTCollecti
 
     minters: Minters;
 
-    minTonForStorage: Int = ton("0.02");
-    gasConsumption: Int = ton("0.02");
+    minTonForStorage: Int = ton("0.03");
+    gasConsumption: Int = ton("0.03");
 
     init(collection_content: Cell) {
         self.owner = sender();
@@ -68,6 +68,7 @@ contract ChallengeNFTCollection with Deployable, Ownable, Resumable, NFTCollecti
             let nftAddress: Address = contractAddress(nftInit);
             send(SendParameters{
                 to: nftAddress,
+                mode: SendIgnoreErrors,
                 code: nftInit.code,
                 data: nftInit.data,
                 value: self.msgValue(context().value),
@@ -105,8 +106,8 @@ contract ChallengeNFTItem with Ownable, NFTItemStandard {
     collection_address: Address;
     individual_content: Cell;
 
-    minTonForStorage: Int = ton("0.02");
-    gasConsumption: Int = ton("0.02");
+    minTonForStorage: Int = ton("0.05");
+    gasConsumption: Int = ton("0.05");
 
     init(collection_address: Address, index: Int, owner: Address, individual_content: Cell) {
         self.collection_address = collection_address;
