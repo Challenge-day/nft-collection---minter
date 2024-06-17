@@ -4,7 +4,7 @@ struct Minters {
 }
 
 struct NFTData {
-  init: Bool = false;
+  is_initialized: Bool = false;
   index: Int as uint256;
   collection_address: Address;
   owner_address: Address;
@@ -44,4 +44,17 @@ extends mutates fun removeMinter(self: Minters, minter: Address): Int {
   self.minters.del(mapIndex!!);
   self.length -= 1;
   return self.length;
+}
+
+extends fun isMinter(self: Minters, wallet: Address): Bool {
+  let _is_minter: Bool = false;
+  let minters: map<Int as uint256, Address> = self.minters;
+
+  foreach(_, value in minters) {
+    if (value == wallet) {
+      _is_minter = true;
+    }
+  }
+
+  return _is_minter;
 }
