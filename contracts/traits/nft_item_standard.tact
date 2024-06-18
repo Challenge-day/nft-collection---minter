@@ -20,7 +20,7 @@ trait NFTItemStandard with Ownable {
         let collectionData: String = self.individual_content.asSlice().asString();
         builder.append(collectionData);
         builder.append(self.index.toString());
-        builder.append(".json");
+        builder.append("/meta.json");
 
         return NFTData {
             is_initialized: self.initialized, 

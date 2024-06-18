@@ -38,3 +38,13 @@ message(0x8b771735) ReportStaticData {
     index: Int as uint256;
     collection: Address;
 }
+
+message(0x11223) Minter {
+  query_id: Int as uint64;
+  minter: Address;
+}
+
+message(0x11322) SetMaxMintable {
+  query_id: Int as uint64;
+  max: Int as uint256;
+}

@@ -1,6 +1,6 @@
 import { Blockchain, SandboxContract, TreasuryContract } from '@ton/sandbox';
 import { beginCell, toNano } from '@ton/core';
-import { ChallengeNFTCollection } from '../wrappers/ChallengeNFTCollection';
+import { ChallengeNFTCollection } from '../wrappers/all';
 import '@ton/test-utils';
 
 describe('ChallengeNFTCollection', () => {

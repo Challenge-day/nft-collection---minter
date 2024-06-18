@@ -17,12 +17,11 @@ export async function run(provider: NetworkProvider) {
 
     await challengeNFTCollection.send(
         provider.sender(),
-        { value: toNano('0.15') },
+        { value: toNano('0.05') },
         {
-            $$type: 'Mint',
+            $$type: 'Minter',
             query_id: 0n,
-            quantity: 3n,
-            new_owner: Address.parse('0QDOekWhG6_fn14DU51jnA7hniRfWFn_JZt-hFN4JrZuB-ea'),
+            minter: Address.parse("EQDCx2eN6ilaknRrdNNhMkg85AEcPYAQYKN7NSdS-uebVau7"),
         },
     );
 
